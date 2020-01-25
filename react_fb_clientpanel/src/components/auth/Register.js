@@ -6,22 +6,28 @@ import { firebaseConnect } from "react-redux-firebase";
 import { notifyUser } from "../../actions/notifyActions";
 import Alert from "../layouts/Alert";
 
-class Login extends Component {
+class Register extends Component {
   state = {
     email: "",
     password: ""
   };
 
+  UNSAFE_componentWillMount() {
+    const { allowRegistration } = this.props.settings;
+
+    if (!allowRegistration) {
+      this.props.history.push("/");
+    }
+  }
+
   onSubmit = e => {
     e.preventDefault();
     const { firebase, notifyUser } = this.props;
     const { email, password } = this.state;
+    //Register with firebase
     firebase
-      .login({
-        email,
-        password
-      })
-      .catch(err => notifyUser("Invalid Login Credentials", "error"));
+      .createUser({ email, password })
+      .catch(err => notifyUser("That User Already Exists!", "error"));
   };
 
   onChange = e => this.setState({ [e.target.name]: e.target.value });
@@ -38,7 +44,7 @@ class Login extends Component {
               ) : null}
               <h1 className='text-center pb-4 pb-3'>
                 <span className='text-primary'>
-                  <i className='fas fa-lock'></i> Login
+                  <i className='fas fa-lock'></i> Register
                 </span>
               </h1>
               <form onSubmit={this.onSubmit}>
@@ -54,7 +60,7 @@ class Login extends Component {
                   />
                 </div>
                 <div className='form-group'>
-                  <label htmlFor='password'>password</label>
+                  <label htmlFor='password'>Password</label>
                   <input
                     type='password'
                     className='form-control'
@@ -66,7 +72,7 @@ class Login extends Component {
                 </div>
                 <input
                   type='submit'
-                  value='Login'
+                  value='Register'
                   className='btn btn-primary btn-block mt-4'
                 />
               </form>
@@ -78,18 +84,20 @@ class Login extends Component {
   }
 }
 
-Login.propTypes = {
+Register.propTypes = {
   firebase: PropTypes.object.isRequired,
+  notifyUser: PropTypes.func.isRequired,
   notify: PropTypes.object.isRequired,
-  notifyUser: PropTypes.func.isRequired
+  settings: PropTypes.object.isRequired
 };
 
 export default compose(
   firebaseConnect(),
   connect(
     (state, props) => ({
-      notify: state.notify
+      notify: state.notify,
+      settings: state.settings
     }),
     { notifyUser }
   )
-)(Login);
+)(Register);

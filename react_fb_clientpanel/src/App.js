@@ -10,6 +10,8 @@ import AddClient from "./components/clients/AddClient";
 import ClientDetails from "./components/clients/ClientDetails";
 import EditClient from "./components/clients/EditClient";
 import Login from "./components/auth/Login";
+import Register from "./components/auth/Register";
+import Settings from "./components/settings/Settings";
 import { UserIsAuthenticated, UserIsNotAuthenticated } from "./helpers/auth";
 
 function App() {
@@ -45,6 +47,16 @@ function App() {
                   exact
                   path='/login'
                   component={UserIsNotAuthenticated(Login)}
+                />
+                <Route
+                  exact
+                  path='/settings'
+                  component={UserIsAuthenticated(Settings)}
+                />
+                <Route
+                  exact
+                  path='/register'
+                  component={UserIsNotAuthenticated(Register)}
                 />
               </Switch>
             </div>
